@@ -1,0 +1,1077 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>ChargeRW Customer Dashboard</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: the same dark rail as the station and admin dashboards; the driver's live charge leads, account details follow */
+:root {
+  --bg: #F2F5F9; --surface: #FFFFFF; --surface-2: #EBF0F6;
+  --border: rgba(10,20,40,0.08); --border-strong: rgba(10,20,40,0.16);
+  --fg: #0D1B2A; --fg-2: #4A5E72; --fg-3: #8A9BB0; --axis: #6B7F94;
+  --green: #0CC87B; --green-soft: rgba(12,200,123,0.10); --green-ink: #057A4C;
+  --amber: #F5A623; --amber-soft: rgba(245,166,35,0.12); --amber-ink: #8F5A00;
+  --red: #F04E37; --red-soft: rgba(240,78,55,0.10); --red-ink: #BE2E1B;
+  --blue: #2563EB; --blue-soft: rgba(37,99,235,0.10); --blue-ink: #1E4FD8;
+  --accent: #0CC87B; --on-accent: #04281A;
+  --rail: #0D1B2A; --rail-hover: #16283C; --rail-active: rgba(12,200,123,0.16);
+  --rail-fg: #E6EEF6; --rail-fg-2: #93A7BC; --rail-line: rgba(255,255,255,0.08);
+  --chart-series: #2563EB; --grid: #E4EAF1; --ring-track: #E4ECF5;
+  --shadow: 0 1px 2px rgba(13,27,42,0.05), 0 10px 28px rgba(13,27,42,0.07);
+  --scrim: rgba(8,14,24,0.48);
+  --radius: 16px; --radius-sm: 10px;
+  --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #080E18; --surface: #101A28; --surface-2: #182333;
+    --border: rgba(255,255,255,0.07); --border-strong: rgba(255,255,255,0.14);
+    --fg: #DCE8F4; --fg-2: #9AAFC4; --fg-3: #6A8099; --axis: #8296AC;
+    --green-soft: rgba(12,200,123,0.13); --green-ink: #3FDDA0;
+    --amber-soft: rgba(245,166,35,0.14); --amber-ink: #FFC163;
+    --red-soft: rgba(240,78,55,0.15); --red-ink: #FF8A78;
+    --blue-soft: rgba(37,99,235,0.2); --blue-ink: #8EB2FF;
+    --rail: #050A12; --rail-hover: #0F1A28; --rail-active: rgba(12,200,123,0.14);
+    --rail-fg: #DCE8F4; --rail-fg-2: #7F95AD; --rail-line: rgba(255,255,255,0.06);
+    --chart-series: #2563EB; --grid: #1D2A3B; --ring-track: #182333;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 10px 28px rgba(0,0,0,0.3);
+    --scrim: rgba(0,0,0,0.6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #080E18; --surface: #101A28; --surface-2: #182333;
+  --border: rgba(255,255,255,0.07); --border-strong: rgba(255,255,255,0.14);
+  --fg: #DCE8F4; --fg-2: #9AAFC4; --fg-3: #6A8099; --axis: #8296AC;
+  --green-soft: rgba(12,200,123,0.13); --green-ink: #3FDDA0;
+  --amber-soft: rgba(245,166,35,0.14); --amber-ink: #FFC163;
+  --red-soft: rgba(240,78,55,0.15); --red-ink: #FF8A78;
+  --blue-soft: rgba(37,99,235,0.2); --blue-ink: #8EB2FF;
+  --rail: #050A12; --rail-hover: #0F1A28; --rail-active: rgba(12,200,123,0.14);
+  --rail-fg: #DCE8F4; --rail-fg-2: #7F95AD; --rail-line: rgba(255,255,255,0.06);
+  --chart-series: #2563EB; --grid: #1D2A3B; --ring-track: #182333;
+  --shadow: 0 1px 2px rgba(0,0,0,0.4), 0 10px 28px rgba(0,0,0,0.3);
+  --scrim: rgba(0,0,0,0.6);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 400 14px/1.5 var(--font-ui); -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+p { margin: 0; }
+ul { margin: 0; padding: 0; list-style: none; }
+fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+a { color: var(--blue-ink); }
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+.muted { color: var(--fg-2); }
+.mono { font-family: var(--font-mono); font-size: 0.92em; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+/* ---------- shell ---------- */
+.app { display: grid; grid-template-columns: 236px minmax(0, 1fr); height: 100%; }
+.rail { background: var(--rail); color: var(--rail-fg); display: flex; flex-direction: column; gap: 26px; padding-block: 22px 18px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; overflow-y: auto; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 17px; letter-spacing: -0.3px; }
+.brand b { color: var(--accent); font-weight: 800; }
+.brand-mark { width: 30px; height: 30px; border-radius: 8px; background: var(--accent); display: grid; place-items: center; font-size: 15px; }
+.brand-tag { margin-left: auto; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--rail-fg-2); border: 1px solid var(--rail-line); border-radius: 6px; padding: 2px 6px; }
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav-item { display: flex; align-items: center; gap: 11px; width: 100%; padding: 9px 10px; border: 0; border-radius: 10px; background: transparent; color: var(--rail-fg-2); font-weight: 600; font-size: 14px; cursor: pointer; text-align: left; }
+.nav-item:hover { background: var(--rail-hover); color: var(--rail-fg); }
+.nav-item[aria-current="page"] { background: var(--rail-active); color: var(--rail-fg); }
+.nav-item svg { width: 18px; height: 18px; flex: none; }
+.nav-badge { margin-left: auto; min-width: 20px; text-align: center; background: var(--amber); color: #2A1A00; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 6px; }
+.rail-foot { margin-top: auto; display: grid; gap: 14px; border-top: 1px solid var(--rail-line); padding-top: 16px; }
+.who { display: flex; gap: 10px; align-items: center; min-width: 0; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-weight: 800; flex: none; }
+.who-text { min-width: 0; }
+.who-name { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.who-sub { font-size: 12px; color: var(--rail-fg-2); }
+.theme-btn { display: flex; align-items: center; gap: 8px; border: 1px solid var(--rail-line); background: transparent; color: var(--rail-fg-2); border-radius: 10px; padding: 7px 10px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.theme-btn:hover { color: var(--rail-fg); background: var(--rail-hover); }
+.main { overflow-y: auto; min-width: 0; }
+.main-inner { max-width: 1120px; margin: 0 auto; display: grid; gap: 20px; padding-block: 20px 56px; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+.view { display: grid; gap: 20px; min-width: 0; }
+
+.proto { border: 1.5px dashed var(--border-strong); border-radius: var(--radius-sm); padding: 9px 14px; display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; background: var(--surface); font-size: 13px; }
+.proto-title { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--fg-2); }
+.proto label { display: inline-flex; gap: 7px; align-items: center; cursor: pointer; }
+.proto input { accent-color: var(--accent); width: 15px; height: 15px; }
+.link-btn { border: 0; background: none; color: var(--blue-ink); font-weight: 600; cursor: pointer; padding: 2px 0; font-size: 13px; }
+.link-btn:hover { text-decoration: underline; }
+.page-head h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+.page-sub { color: var(--fg-2); margin-top: 2px; }
+
+/* ---------- pieces ---------- */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; min-width: 0; }
+.card-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+.card-head h2 { font-size: 16px; font-weight: 700; }
+.card-head p { color: var(--fg-2); font-size: 13px; margin-top: 2px; }
+.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--fg-2); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 38px; padding: 8px 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--border-strong); background: var(--surface); color: var(--fg); font-weight: 600; font-size: 13px; cursor: pointer; white-space: nowrap; text-decoration: none; }
+.btn:hover:not(:disabled) { background: var(--surface-2); }
+.btn:disabled { cursor: not-allowed; opacity: 0.5; }
+.btn-sm { min-height: 30px; padding: 4px 10px; font-size: 12px; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.btn-primary:hover:not(:disabled) { background: var(--accent); filter: brightness(1.06); }
+.btn-danger { background: var(--red); border-color: var(--red); color: #FFFFFF; }
+.btn-danger:hover:not(:disabled) { background: var(--red); filter: brightness(1.06); }
+.btn-ghost { border-color: transparent; background: transparent; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.pill-green { background: var(--green-soft); color: var(--green-ink); }
+.pill-amber { background: var(--amber-soft); color: var(--amber-ink); }
+.pill-red { background: var(--red-soft); color: var(--red-ink); }
+.pill-blue { background: var(--blue-soft); color: var(--blue-ink); }
+.pill-plain { background: var(--surface-2); color: var(--fg-2); }
+.switch { position: relative; width: 44px; height: 26px; border-radius: 13px; border: 0; background: var(--border-strong); cursor: pointer; flex: none; transition: background 0.15s; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: transform 0.15s; }
+.switch[aria-checked="true"] { background: var(--accent); }
+.switch[aria-checked="true"]::after { transform: translateX(18px); }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.row-end { justify-content: flex-end; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; min-width: 0; }
+.tile-label { font-size: 13px; color: var(--fg-2); font-weight: 500; }
+.tile-value { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; margin-top: 4px; line-height: 1.2; }
+.tile-value small { font-size: 13px; font-weight: 600; color: var(--fg-2); letter-spacing: 0; margin-left: 3px; }
+.tile-sub { font-size: 12px; color: var(--fg-2); margin-top: 4px; }
+.two-col { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; align-items: start; }
+
+/* live session */
+.live { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 24px; align-items: center; }
+.ring { position: relative; width: 170px; height: 170px; display: grid; place-items: center; }
+.ring svg { position: absolute; inset: 0; }
+.ring-pct { font-size: 36px; font-weight: 800; letter-spacing: -1px; }
+.ring-label { font-size: 12px; color: var(--fg-2); margin-top: -4px; text-align: center; }
+.live-head { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin-bottom: 4px; }
+.live-head h2 { font-size: 18px; font-weight: 800; }
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 14px 0; }
+.metric { background: var(--surface-2); border-radius: var(--radius-sm); padding: 10px 12px; }
+.metric span { display: block; font-size: 11px; font-weight: 600; color: var(--fg-2); }
+.metric strong { font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.confirm { background: var(--surface-2); border-radius: var(--radius-sm); padding: 12px; display: grid; gap: 10px; font-size: 13px; }
+.notice { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; border-radius: var(--radius); padding: 14px 18px; background: var(--amber-soft); }
+.notice strong { display: block; color: var(--amber-ink); }
+
+/* stations */
+.stations { display: grid; gap: 10px; }
+.station { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.station:last-child { border-bottom: 0; padding-bottom: 0; }
+.station:first-child { padding-top: 0; }
+.st-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 18px; }
+.st-name { font-weight: 700; }
+.st-meta { font-size: 12px; color: var(--fg-2); }
+.star { width: 36px; height: 36px; border-radius: 10px; border: 1.5px solid var(--border-strong); background: var(--surface); cursor: pointer; font-size: 16px; color: var(--fg-3); }
+.star[aria-pressed="true"] { color: var(--amber); border-color: var(--amber); background: var(--amber-soft); }
+
+/* tables */
+.table-wrap { position: relative; overflow-x: auto; margin: 0 -20px; padding: 0 20px; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th { text-align: left; font-size: 12px; font-weight: 600; color: var(--fg-2); padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+td { padding: 10px; border-bottom: 1px solid var(--border); white-space: nowrap; font-variant-numeric: tabular-nums; }
+th:first-child, td:first-child { padding-left: 0; }
+th:last-child, td:last-child { padding-right: 0; }
+td.r, th.r { text-align: right; }
+tbody tr:last-child td { border-bottom: 0; }
+tfoot td { font-weight: 700; border-bottom: 0; border-top: 2px solid var(--border-strong); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.toolbar .grow { margin-left: auto; }
+
+/* chart */
+.chart { position: relative; min-width: 0; outline-offset: 4px; }
+.chart svg { display: block; overflow: visible; }
+.chart .grid { stroke: var(--grid); stroke-width: 1; }
+.chart .axis { fill: var(--axis); font-size: 11px; font-variant-numeric: tabular-nums; }
+.chart .val { fill: var(--fg); font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; paint-order: stroke; stroke: var(--surface); stroke-width: 4px; stroke-linejoin: round; }
+.chart .bar { transition: opacity 0.12s; }
+.chart.has-hover .bar:not(.is-hover) { opacity: 0.4; }
+.tip { position: absolute; transform: translate(-50%, calc(-100% - 10px)); background: var(--fg); color: var(--surface); border-radius: 8px; padding: 6px 10px; font-size: 12px; pointer-events: none; white-space: nowrap; display: grid; gap: 1px; box-shadow: var(--shadow); z-index: 2; }
+.tip strong { font-size: 14px; font-variant-numeric: tabular-nums; }
+
+/* forms */
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px 16px; }
+.field { display: grid; gap: 6px; min-width: 0; align-content: start; }
+.field label, .field .label { font-size: 13px; font-weight: 600; }
+.hint { font-size: 12px; color: var(--fg-2); }
+.input { width: 100%; min-height: 40px; border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); padding: 8px 11px; font-size: 14px; }
+.input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
+.input[readonly] { background: var(--surface-2); color: var(--fg-2); }
+.input[aria-invalid="true"] { border-color: var(--red); }
+.err { color: var(--red-ink); font-size: 12px; font-weight: 600; }
+.check { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; cursor: pointer; }
+.check input { accent-color: var(--accent); width: 16px; height: 16px; }
+.items { display: grid; gap: 8px; }
+.item { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: space-between; background: var(--surface-2); border-radius: var(--radius-sm); padding: 12px 14px; }
+.item-main { min-width: 0; }
+.item-main strong { display: block; }
+.item-main span { font-size: 12px; color: var(--fg-2); }
+.tag { font-size: 11px; font-weight: 700; border-radius: 6px; padding: 2px 7px; background: var(--green-soft); color: var(--green-ink); margin-left: 6px; vertical-align: 1px; }
+.setting { display: flex; gap: 14px; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.setting:last-child { border-bottom: 0; padding-bottom: 0; }
+.setting:first-of-type { padding-top: 0; }
+.setting-text { min-width: 0; }
+.setting-text strong { display: block; font-weight: 600; }
+.setting-text span { font-size: 13px; color: var(--fg-2); }
+.radio-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.radio-card { display: flex; gap: 8px; align-items: center; border: 1.5px solid var(--border-strong); border-radius: var(--radius-sm); padding: 9px 12px; cursor: pointer; font-weight: 600; font-size: 13px; }
+.radio-card:has(input:checked) { border-color: var(--accent); background: var(--green-soft); }
+.radio-card input { accent-color: var(--accent); }
+.save-note { font-size: 12px; color: var(--fg-2); }
+
+/* modal & toast */
+.scrim { position: fixed; inset: 0; background: var(--scrim); display: grid; justify-items: center; align-items: start; z-index: 50; overflow-y: auto; padding: 32px max(16px, env(safe-area-inset-right, 0px)) 32px max(16px, env(safe-area-inset-left, 0px)); }
+.modal { width: min(480px, 100%); background: var(--surface); border-radius: var(--radius); padding: 22px; display: grid; gap: 14px; box-shadow: var(--shadow); margin-block: auto; }
+.modal h2 { font-size: 18px; font-weight: 800; }
+.modal-head { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; }
+.modal-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.close-x { width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--surface-2); cursor: pointer; color: var(--fg-2); flex: none; font-size: 15px; }
+.receipt { border: 1.5px dashed var(--border-strong); border-radius: var(--radius-sm); padding: 14px 16px; display: grid; gap: 6px; font-size: 13px; }
+.receipt div { display: flex; justify-content: space-between; gap: 12px; }
+.receipt div span:first-child { color: var(--fg-2); }
+.receipt .total { border-top: 1px solid var(--border-strong); margin-top: 4px; padding-top: 8px; font-size: 15px; font-weight: 800; }
+.toasts { position: fixed; z-index: 60; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; justify-items: end; pointer-events: none; }
+.toast { background: var(--fg); color: var(--surface); padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; box-shadow: var(--shadow); max-width: min(420px, calc(100vw - 32px)); }
+
+@media (max-width: 880px) {
+  .app { display: block; height: auto; }
+  .rail { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); overflow: visible; }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 40; background: var(--rail); }
+  .brand-tag { margin-left: 0; }
+  .nav { order: 3; width: 100%; flex-direction: row; overflow-x: auto; gap: 2px; scrollbar-width: none; }
+  .nav-item { width: auto; white-space: nowrap; padding: 7px 9px; gap: 7px; }
+  .nav-badge { margin-left: 2px; }
+  .rail-foot { margin: 0 0 0 auto; border: 0; padding: 0; display: flex; align-items: center; gap: 8px; }
+  .who-text, .theme-label { display: none; }
+  .main { overflow: visible; }
+  .main-inner { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+}
+@media (max-width: 560px) {
+  .card { padding: 16px; }
+  .table-wrap { margin: 0 -16px; padding: 0 16px; }
+  .live { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+  .live-body { width: 100%; }
+  .tile-value { font-size: 22px; }
+}
+</style>
+
+<div class="app">
+  <aside class="rail" aria-label="ChargeRW customer account">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">⚡</span><span>Charge<b>RW</b></span><span class="brand-tag">Account</span></div>
+    <nav class="nav" aria-label="Sections">
+      <button class="nav-item" type="button" data-tab="overview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>Overview</button>
+      <button class="nav-item" type="button" data-tab="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>Charging history<span class="nav-badge" id="badge-pending" hidden></span></button>
+      <button class="nav-item" type="button" data-tab="profile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profile &amp; car</button>
+      <button class="nav-item" type="button" data-tab="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>Settings</button>
+    </nav>
+    <div class="rail-foot">
+      <div class="who"><span class="avatar" id="who-initial" aria-hidden="true">J</span><div class="who-text"><p class="who-name" id="who-name">Jean-Pierre Habimana</p><p class="who-sub" id="who-phone"></p></div></div>
+      <button class="theme-btn" id="theme-btn" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><span class="theme-label" id="theme-label">Dark mode</span></button>
+    </div>
+  </aside>
+
+  <main class="main" id="main">
+    <div class="main-inner">
+      <section class="proto" aria-label="Prototype controls">
+        <span class="proto-title">Prototype controls</span>
+        <span class="muted">Demo data. Your edits are kept in this browser only.</span>
+        <label><input type="checkbox" id="pv-live" checked> Car charging right now</label>
+        <button type="button" class="link-btn" data-act="reset-demo">Reset demo</button>
+      </section>
+      <header class="page-head"><h1 id="page-title">Overview</h1><p class="page-sub" id="page-sub"></p></header>
+      <div id="view" class="view"></div>
+    </div>
+  </main>
+</div>
+<div id="modal-root"></div>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+
+/* ================= clock: the demo opens at 18:20 today, like the station and admin dashboards ================= */
+const MIN = 60000, HOUR = 3600000, DAY = 86400000;
+const TODAY = new Date(); TODAY.setHours(0, 0, 0, 0);
+const T0 = TODAY.getTime();
+const OPENED_AT = T0 + (18 * 60 + 20) * MIN;
+const SITE = 'https://1selavolts-sudo.github.io/chargerw-site';
+
+/* ================= shared demo network (same copy in all three dashboards) ================= */
+// The website and the three dashboards keep one record in this browser's storage, so a change in one tab shows in the
+// others. It has the shape of the Firestore collections it stands in for: stations, sessions and the driver profile.
+const NET_KEY = 'chargerw-network-v1';
+const NET_DAY = `${TODAY.getFullYear()}-${String(TODAY.getMonth() + 1).padStart(2, '0')}-${String(TODAY.getDate()).padStart(2, '0')}`;
+const parseNet = text => { try { const n = JSON.parse(text || 'null'); return n && n.v === 2 && n.day === NET_DAY ? n : null; } catch (e) { return null; } };
+const readNet = () => { try { return parseNet(localStorage.getItem(NET_KEY)); } catch (e) { return null; } };
+let NET = readNet();
+let ANCHOR = NET ? NET.anchor : Date.now(); // the real time at which the demo clock showed 18:20
+let netJson = NET ? JSON.stringify(NET) : '';
+const now = () => OPENED_AT + (Date.now() - ANCHOR);
+// The amenity types every station chooses from. Only the admin changes this list (System → Amenities).
+const DEFAULT_AMENITIES = [
+  { key: 'Coffee', icon: '☕', label: 'Coffee shop' }, { key: 'WiFi', icon: '📶', label: 'WiFi' }, { key: 'Restroom', icon: '🚻', label: 'Restroom' },
+  { key: 'Parking', icon: '🅿️', label: 'Parking' }, { key: 'Solar', icon: '☀️', label: 'Solar powered' }, { key: 'Shopping', icon: '🛍️', label: 'Shopping nearby' },
+  { key: 'Lounge', icon: '🛋️', label: 'Lounge' },
+];
+function seedNet() {
+  const t = OPENED_AT;
+  const hm = (h, m) => T0 + (h * 60 + m) * MIN;
+  const week = (open, close) => Object.fromEntries(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(d => [d, { closed: false, open, close }]));
+  const daysAgo = (n, h, m) => { const d = new Date(TODAY); d.setDate(d.getDate() - n); return d.getTime() + (h * 60 + m) * MIN; };
+  const slot = (id, type, kw, connector, status, since, session = null) => ({ id, type, kw, connector, status, since, session });
+  return {
+    v: 2, day: NET_DAY, anchor: ANCHOR,
+    amenities: DEFAULT_AMENITIES.map(a => ({ ...a })),
+    driver: { id: 'jp', name: 'Jean-Pierre Habimana', phone: '+250 788 000 452', showName: true },
+    sessions: [],
+    ready: [], // drivers who picked a charger in the app and wait for its manager to start the charge
+    stations: [
+      { id: 'selavolt', name: 'SELAVOLT Kigali Central', managerId: 'm1', address: 'KN 4 Ave, City Centre', city: 'Kigali', lat: -1.9441, lng: 30.0619, rating: 4.9, distanceKm: 0.3,
+        price: 200, open24h: true, hours: week('07:00', '22:00'), amenities: ['WiFi', 'Restroom', 'Coffee'],
+        status: 'active', prevStatus: 'active', online: true, onlineSince: hm(7, 30), offline: null, flags: { financial: true, history: true, ocpp: false }, updated: t - 34 * MIN,
+        chargers: [slot('DC-1', 'DC', 120, 'CCS', 'available', hm(17, 30)),
+          slot('DC-2', 'DC', 120, 'CCS', 'busy', t - 34 * MIN, { driver: 'Jean-Pierre Habimana', driverId: 'jp', start: t - 34 * MIN, kwhAt: 22.4, at: t, kw: 40, startPct: 38, maxKwh: 44.1 })] },
+      { id: 'kigalihub', name: 'KigaliHub Fast Charge', managerId: 'm2', address: 'KG 7 Ave, Nyarugenge', city: 'Kigali', lat: -1.9480, lng: 30.0680, rating: 4.6, distanceKm: 0.8,
+        price: 180, open24h: true, hours: week('07:00', '22:00'), amenities: ['WiFi', 'Parking'],
+        status: 'active', prevStatus: 'active', online: true, onlineSince: hm(6, 0), offline: null, flags: { financial: false, history: false, ocpp: false }, updated: t - 60 * MIN,
+        chargers: [slot('A1', 'DC', 50, 'CCS', 'available', hm(14, 41)), slot('A2', 'DC', 50, 'CHAdeMO', 'available', hm(15, 51)),
+          slot('B1', 'AC', 22, 'Type2', 'busy', t - 60 * MIN, { driver: 'Aimable K.', driverId: null, start: t - 60 * MIN, kwhAt: 10.5, at: t, kw: 10.5, startPct: null, maxKwh: null }),
+          slot('B2', 'AC', 22, 'Type2', 'available', hm(11, 41))] },
+      { id: 'norrsken', name: 'Norrsken House Charging', managerId: 'm3', address: 'KG 532 St, Kacyiru', city: 'Kigali', lat: -1.9390, lng: 30.0650, rating: 4.7, distanceKm: 1.2,
+        price: 160, open24h: false, hours: { ...week('08:00', '20:00'), sat: { closed: false, open: '09:00', close: '17:00' }, sun: { closed: true, open: '09:00', close: '17:00' } },
+        amenities: ['WiFi', 'Lounge'], status: 'coming_soon', prevStatus: 'coming_soon', online: false, onlineSince: null, offline: null,
+        flags: { financial: false, history: false, ocpp: false }, updated: t - 26 * HOUR,
+        chargers: [slot('N1', 'AC', 22, 'Type2', 'available', daysAgo(6, 11, 0)), slot('N2', 'AC', 22, 'Type2', 'available', daysAgo(6, 11, 0)),
+          slot('N3', 'AC', 22, 'Type2', 'out_of_order', t - 26 * HOUR)] },
+    ],
+  };
+}
+function saveNet() {
+  const text = JSON.stringify(NET);
+  if (text === netJson) return;
+  netJson = text;
+  try { localStorage.setItem(NET_KEY, text); } catch (e) { /* storage blocked: this tab keeps working on its own */ }
+}
+function resetNet() { ANCHOR = Date.now(); NET = seedNet(); saveNet(); }
+if (!NET) { NET = seedNet(); saveNet(); }
+// Another tab changed the network: take its version (a reset elsewhere brings a new clock anchor too)
+function onNetChange(apply) {
+  window.addEventListener('storage', ev => {
+    if (ev.key !== NET_KEY) return;
+    const n = parseNet(ev.newValue);
+    if (!n) return;
+    NET = n; ANCHOR = n.anchor; netJson = ev.newValue;
+    apply();
+  });
+}
+// Kilowatt-hours delivered so far, capped where the car's battery is full
+const liveKwh = s => (s && s.kwhAt != null ? Math.min(s.maxKwh ?? Infinity, s.kwhAt + (s.kw * (now() - s.at)) / HOUR) : null);
+
+/* ================= formatting ================= */
+const NF0 = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
+const NF1 = new Intl.NumberFormat('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const rwf = n => NF0.format(Math.round(n));
+const kwhFmt = n => NF1.format(n);
+const pad = n => String(n).padStart(2, '0');
+const WD = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MO = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const hhmm = ts => { const d = new Date(ts); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+const dayName = ts => { const d = new Date(ts); return `${WD[d.getDay()]} ${d.getDate()} ${MO[d.getMonth()]}`; };
+const stamp = ts => (ts >= T0 ? `Today ${hhmm(ts)}` : ts >= T0 - DAY ? `Yesterday ${hhmm(ts)}` : `${dayName(ts)} ${new Date(ts).getFullYear() === TODAY.getFullYear() ? '' : new Date(ts).getFullYear() + ' '}· ${hhmm(ts)}`);
+const durMin = m => (m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${pad(m % 60)} min`);
+const isoDate = ts => { const d = new Date(ts); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+const monthKey = ts => { const d = new Date(ts); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}`; };
+const monthLabel = key => { const [y, m] = key.split('-').map(Number); return `${MONTHS[m - 1]} ${y}`; };
+const compact = n => (n >= 1e6 ? `${+(n / 1e6).toFixed(1)}M` : n >= 1000 ? `${+(n / 1000).toFixed(n >= 1e5 ? 0 : 1)}K` : `${+n.toFixed(n % 1 ? 1 : 0)}`);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const sum = (arr, f) => arr.reduce((a, x) => a + (f(x) || 0), 0);
+const normalizePhone = input => {
+  const digits = String(input).replace(/\D/g, '');
+  const local = digits.startsWith('250') ? digits.slice(3) : digits.replace(/^0/, '');
+  return /^7[2389]\d{7}$/.test(local) ? `+250 ${local.slice(0, 3)} ${local.slice(3, 6)} ${local.slice(6)}` : null;
+};
+const providerOf = phone => { const p = phone.replace(/\D/g, '').slice(3, 5); return p === '78' || p === '79' ? 'mtn' : p === '72' || p === '73' ? 'airtel' : null; };
+const PROVIDER = { mtn: 'MTN MoMo', airtel: 'Airtel Money' };
+const last4 = phone => phone.replace(/\D/g, '').slice(-4);
+
+/* ================= demo data ================= */
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+// Names and prices for the history; live status always comes from the shared network
+const STATIONS = [
+  { id: 'selavolt', name: 'SELAVOLT Kigali Central', address: 'KN 4 Ave, City Centre', price: 200, hours: 'Open 24/7', status: 'active',
+    chargers: [{ id: 'DC-1', type: 'DC', kw: 120, connector: 'CCS', status: 'available' }, { id: 'DC-2', type: 'DC', kw: 120, connector: 'CCS', status: 'busy' }] },
+  { id: 'kigalihub', name: 'KigaliHub Fast Charge', address: 'KG 7 Ave, Nyarugenge', price: 180, hours: 'Open 24/7', status: 'active',
+    chargers: [{ id: 'A1', type: 'DC', kw: 50, connector: 'CCS', status: 'available' }, { id: 'A2', type: 'DC', kw: 50, connector: 'CHAdeMO', status: 'available' },
+      { id: 'B1', type: 'AC', kw: 22, connector: 'Type2', status: 'busy' }, { id: 'B2', type: 'AC', kw: 22, connector: 'Type2', status: 'available' }] },
+  { id: 'norrsken', name: 'Norrsken House Charging', address: 'KG 532 St, Kacyiru', price: 160, hours: 'Mon–Fri 08:00–20:00', status: 'coming_soon',
+    chargers: [{ id: 'N1', type: 'AC', kw: 22, connector: 'Type2', status: 'available' }, { id: 'N2', type: 'AC', kw: 22, connector: 'Type2', status: 'available' },
+      { id: 'N3', type: 'AC', kw: 22, connector: 'Type2', status: 'out_of_order' }] },
+];
+const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+const hoursText = st => {
+  if (typeof st.hours === 'string') return st.hours;
+  if (st.open24h) return 'Open 24/7';
+  const h = st.hours[DAY_KEYS[TODAY.getDay()]];
+  return h.closed ? 'Closed today' : `Today ${h.open}–${h.close}`;
+};
+const station = id => { const n = NET.stations.find(s => s.id === id) || STATIONS.find(s => s.id === id); return n && { ...n, hours: hoursText(n) }; };
+const liveStations = () => NET.stations.filter(s => s.status !== 'hidden').map(n => ({ ...n, hours: hoursText(n) }));
+const CONNECTORS = { CCS: 'CCS', CHAdeMO: 'CHAdeMO', Type2: 'Type 2' };
+
+// Jean-Pierre's past charges: about 2–3 a week over four months, mostly at SELAVOLT
+function genHistory() {
+  const rand = mulberry32(452);
+  const out = [];
+  for (let d = 122; d >= 1; d--) {
+    if (rand() > 0.37) continue;
+    const day = new Date(TODAY); day.setDate(day.getDate() - d);
+    const atHub = rand() < 0.35;
+    const st = atHub ? 'kigalihub' : 'selavolt';
+    const ac = atHub && rand() < 0.25;
+    const charger = atHub ? (ac ? 'B2' : 'A1') : (rand() < 0.5 ? 'DC-1' : 'DC-2');
+    const kwh = Math.round((ac ? 10 + rand() * 9 : 16 + rand() * 22) * 10) / 10;
+    const minutes = Math.round((kwh / (ac ? 10.5 : 40)) * 60);
+    const start = Math.round((7 * 60 + rand() * 13 * 60));
+    const idle = ac && rand() < 0.4 ? 2000 + Math.floor(rand() * 7) * 100 : 0;
+    const ts = day.getTime() + start * MIN;
+    const method = rand() < 0.8 ? 'p1' : 'p2';
+    out.push({ id: `s${ts}`, stationId: st, charger, ts, minutes, kwh, price: station(st).price, idle, cost: Math.round(kwh * station(st).price) + idle,
+      payment: 'paid', method, ref: `MP${isoDate(ts).slice(2).replace(/-/g, '')}.${pad(Math.floor(start / 60))}${pad(start % 60)}.${String(10000 + Math.floor(rand() * 89999))}` });
+  }
+  // Yesterday's KigaliHub charge is still waiting for payment
+  const y = new Date(TODAY); y.setDate(y.getDate() - 1);
+  const ts = y.getTime() + (19 * 60 + 12) * MIN;
+  out.push({ id: `s${ts}`, stationId: 'kigalihub', charger: 'A1', ts, minutes: 41, kwh: 27.2, price: 180, idle: 0, cost: Math.round(27.2 * 180), payment: 'pending', method: null, ref: null });
+  return out.sort((a, b) => b.ts - a.ts);
+}
+
+const ACCOUNT_KEY = 'chargerw-customer-account-v1';
+const defaultAccount = () => ({
+  name: 'Jean-Pierre Habimana', phone: '+250 788 000 452', email: '',
+  vehicles: [{ id: 'v1', name: 'Hyundai Kona Electric', plate: 'RAF 452 J', battery: 64, connectors: ['CCS', 'Type2'], isDefault: true }],
+  payments: [{ id: 'p1', provider: 'mtn', phone: '+250 788 000 452', isDefault: true }, { id: 'p2', provider: 'airtel', phone: '+250 732 000 731', isDefault: false }],
+  notif: { fiveMin: true, complete: true, idleFee: true, eighty: false, slotFree: true, receipts: false },
+  channel: 'push', showName: true, favorites: ['selavolt', 'kigalihub'],
+});
+function loadAccount() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(ACCOUNT_KEY) || 'null');
+    if (saved && saved.name && Array.isArray(saved.vehicles)) return { ...defaultAccount(), ...saved };
+  } catch (e) { /* storage unavailable */ }
+  return defaultAccount();
+}
+function saveAccount() { try { localStorage.setItem(ACCOUNT_KEY, JSON.stringify(S.account)); } catch (e) { /* storage unavailable */ } }
+
+const S = {
+  tab: 'overview', account: loadAccount(), baseHistory: genHistory(), history: [],
+  historyMonth: 'all', showTable: false, stopConfirm: false, modal: null, profileErrors: null,
+};
+
+/* ================= Jean-Pierre's charge, read from the shared network ================= */
+const battery = () => (S.account.vehicles.find(v => v.isDefault) || S.account.vehicles[0]).battery;
+// Where his car is plugged in right now (null when it isn't), with the same energy every dashboard shows
+function mySession() {
+  for (const st of NET.stations) {
+    for (const c of st.chargers) {
+      const s = c.session;
+      if (!s || s.driverId !== NET.driver.id) continue;
+      const kwh = liveKwh(s);
+      const pct = s.maxKwh ? s.startPct + (kwh / s.maxKwh) * (100 - s.startPct) : Math.min(100, s.startPct + ((kwh * 0.9) / battery()) * 100);
+      return { stationId: st.id, charger: c.id, kw: s.kw, start: s.start, startPct: s.startPct, maxKwh: s.maxKwh, kwh, pct, status: pct >= 99.95 ? 'full' : 'charging' };
+    }
+  }
+  return null;
+}
+Object.defineProperty(S, 'session', { get: mySession });
+function minutesTo(target) {
+  const s = S.session;
+  if (!s) return 0;
+  const goal = s.maxKwh ? ((target - s.startPct) / (100 - s.startPct)) * s.maxKwh : (((target - s.startPct) / 100) * battery()) / 0.9;
+  return Math.max(0, Math.ceil(((goal - s.kwh) / s.kw) * 60));
+}
+// History = the seeded past + charges finished today in any tab (stopped here, or closed by the station manager)
+function pull() {
+  const fromNet = NET.sessions.filter(x => x.driverId === NET.driver.id).map(x => ({ idle: 0, method: null, ref: null, ...x }));
+  S.history = [...fromNet, ...S.baseHistory].sort((a, b) => b.ts - a.ts);
+  // The customer owns their public profile; the network carries it to station managers
+  Object.assign(NET.driver, { name: S.account.name, phone: S.account.phone, showName: S.account.showName });
+}
+function markPaid(id, method, ref) {
+  const row = NET.sessions.find(x => x.id === id) || S.baseHistory.find(x => x.id === id);
+  if (row) Object.assign(row, { payment: 'paid', method, ref });
+}
+
+/* ================= views ================= */
+const tile = (label, value, sub) => `<div class="tile"><p class="tile-label">${label}</p><p class="tile-value">${value}</p>${sub ? `<p class="tile-sub">${sub}</p>` : ''}</div>`;
+const pending = () => S.history.filter(h => h.payment === 'pending');
+const methodLabel = id => { const p = S.account.payments.find(x => x.id === id); return p ? `${PROVIDER[p.provider]} •••• ${last4(p.phone)}` : 'Mobile Money'; };
+
+function ringSvg(pct) {
+  const r = 70, c = 2 * Math.PI * r, v = clamp(pct, 0, 100);
+  const color = v > 80 ? 'var(--green)' : v > 40 ? 'var(--amber)' : 'var(--red)';
+  return `<svg width="170" height="170" viewBox="0 0 170 170" aria-hidden="true"><circle cx="85" cy="85" r="${r}" fill="none" stroke="var(--ring-track)" stroke-width="14"/>
+    <circle cx="85" cy="85" r="${r}" fill="none" stroke="${color}" stroke-width="14" stroke-linecap="round" stroke-dasharray="${c} ${c}" stroke-dashoffset="${c * (1 - v / 100)}" transform="rotate(-90 85 85)"/></svg>`;
+}
+
+function viewOverview() {
+  const s = S.session;
+  const monthRows = S.history.filter(h => h.ts >= new Date(TODAY.getFullYear(), TODAY.getMonth(), 1).getTime());
+  const mKwh = sum(monthRows, h => h.kwh) + (s ? s.kwh : 0);
+  const mCost = sum(monthRows, h => h.cost);
+  const due = pending();
+  let live;
+  if (s) {
+    const st = station(s.stationId), price = st.price;
+    const full = s.status === 'full';
+    live = `<section class="card" aria-labelledby="live-h"><div class="live">
+      <div class="ring" role="progressbar" aria-label="Battery" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.floor(s.pct)}">${ringSvg(s.pct)}
+        <div><p class="ring-pct" data-tick="pct">${Math.floor(s.pct)}%</p><p class="ring-label">Battery</p></div></div>
+      <div class="live-body">
+        <div class="live-head"><h2 id="live-h">${full ? 'Your car is fully charged' : 'Your car is charging'}</h2><span class="pill ${full ? 'pill-green' : 'pill-blue'}">${full ? 'Full' : 'Charging'}</span></div>
+        <p class="muted">${esc(st.name)} · Slot ${s.charger} · 120 kW · started ${hhmm(s.start)} at ${s.startPct}%</p>
+        <div class="metrics">
+          <div class="metric"><span>Energy</span><strong data-tick="kwh">${kwhFmt(s.kwh)} kWh</strong></div>
+          <div class="metric"><span>Cost so far</span><strong data-tick="cost">${rwf(s.kwh * price)} RWF</strong></div>
+          <div class="metric"><span>Time</span><strong data-tick="elapsed">${durMin(Math.floor((now() - s.start) / MIN))}</strong></div>
+          <div class="metric"><span>${s.pct < 80 ? 'To 80%' : 'To full'}</span><strong data-tick="left">${full ? 'Done' : `${s.pct < 80 ? minutesTo(80) : minutesTo(100)} min`}</strong></div>
+        </div>
+        ${S.stopConfirm ? `<div class="confirm" role="group" aria-labelledby="stop-q"><p id="stop-q"><strong>Stop charging now?</strong> You pay for the energy delivered so far, at ${price} RWF/kWh. Unplug the car once it stops.</p>
+            <div class="row row-end"><button type="button" class="btn btn-ghost" data-act="stop-cancel">Keep charging</button><button type="button" class="btn btn-danger" data-act="stop-yes" id="stop-yes">Stop charging</button></div></div>`
+          : `<div class="row"><button type="button" class="btn" data-act="stop" id="stop-btn">⏹ Stop charging</button>
+            <a class="btn" href="https://www.google.com/maps/dir/?api=1&amp;destination=-1.9441,30.0619" target="_blank" rel="noopener">Directions to the station</a></div>`}
+        <p class="hint" style="margin-top:10px">Kept in step with the ChargeRW app on your phone. Alerts: ${S.account.notif.eighty ? '80%, ' : ''}${S.account.notif.fiveMin ? '5 minutes left, ' : ''}${S.account.notif.complete ? 'fully charged' : 'none for full'}. Change them in Settings.</p>
+      </div></div></section>`;
+  } else {
+    live = `<section class="card" aria-labelledby="live-h"><div class="card-head" style="margin:0"><div><h2 id="live-h">No car charging right now</h2>
+      <p>Pick a free slot on the map and start charging from the ChargeRW app.</p></div>
+      <a class="btn btn-primary" href="${SITE}/map" target="_blank" rel="noopener">🗺 Find a charger</a></div></section>`;
+  }
+  return `${live}
+    ${due.length ? `<section class="notice" aria-label="Payment due"><div><strong>${due.length === 1 ? '1 charge to pay' : `${due.length} charges to pay`} · ${rwf(sum(due, h => h.cost))} RWF</strong>
+      <span class="muted">${due.map(h => `${esc(station(h.stationId).name)}, ${stamp(h.ts).toLowerCase()}`).join(' · ')}</span></div>
+      <button type="button" class="btn btn-primary" data-act="pay" data-id="${due[0].id}">Pay ${rwf(due[0].cost)} RWF</button></section>` : ''}
+    <section class="tiles" aria-label="This month">
+      ${tile(`Charges in ${MONTHS[TODAY.getMonth()]}`, `${monthRows.length + (s ? 1 : 0)}`, s ? 'Including the one running now' : 'This month')}
+      ${tile('Energy', `<span data-tick="month-kwh">${kwhFmt(mKwh)}</span><small>kWh</small>`, `About ${NF0.format(mKwh * 6.5)} km of range`)}
+      ${tile('Spent', `${rwf(mCost)}<small>RWF</small>`, 'Finished charges this month')}
+      ${tile('Average price', `${sum(monthRows, h => h.kwh) ? rwf(mCost / sum(monthRows, h => h.kwh)) : '—'}<small>RWF/kWh</small>`, 'Finished charges, including idle fees')}
+    </section>
+    <section class="card" aria-labelledby="fav-h"><div class="card-head"><div><h2 id="fav-h">Stations</h2><p>Free slots that fit your ${esc((S.account.vehicles.find(v => v.isDefault) || S.account.vehicles[0]).name)}. Star a station to keep it at the top.</p></div></div>
+      <ul class="stations">${liveStations().sort((a, b) => S.account.favorites.includes(b.id) - S.account.favorites.includes(a.id)).map(stationRow).join('')}</ul></section>`;
+}
+
+function stationRow(st) {
+  const v = S.account.vehicles.find(x => x.isDefault) || S.account.vehicles[0];
+  const fits = st.chargers.filter(c => v.connectors.includes(c.connector));
+  const free = fits.filter(c => c.status === 'available' && !(S.session && S.session.stationId === st.id && S.session.charger === c.id));
+  const mine = S.session && S.session.stationId === st.id;
+  const fav = S.account.favorites.includes(st.id);
+  let state, tone;
+  if (st.status === 'coming_soon') { state = 'Coming soon'; tone = 'blue'; }
+  else if (!st.online) { state = 'Temporarily closed'; tone = 'red'; }
+  else if (!fits.length) { state = 'No slot fits your car'; tone = 'plain'; }
+  else if (free.length) { state = `${free.length} free for your car`; tone = 'green'; }
+  else { state = 'Busy'; tone = 'amber'; }
+  const skipped = st.chargers.filter(c => !v.connectors.includes(c.connector)).map(c => `${c.id} is ${CONNECTORS[c.connector]}`);
+  const softBg = { green: 'var(--green-soft)', amber: 'var(--amber-soft)', blue: 'var(--blue-soft)', red: 'var(--red-soft)', plain: 'var(--surface-2)' }[tone];
+  return `<li class="station"><span class="st-icon" style="background:${softBg}" aria-hidden="true">⚡</span>
+    <div style="min-width:0"><p class="st-name">${esc(st.name)} <span class="pill pill-${tone}" style="margin-left:4px">${state}</span></p>
+      <p class="st-meta">${esc(st.address)} · ${st.price} RWF/kWh · ${esc(st.hours)}${mine ? ' · <strong style="color:var(--blue-ink)">You are charging here</strong>' : ''}${skipped.length ? ` · ${skipped.join(', ')}, not compatible` : ''}</p></div>
+    <button type="button" class="star" data-act="fav" data-id="${st.id}" aria-pressed="${fav}" aria-label="${fav ? 'Remove from' : 'Add to'} favourites: ${esc(st.name)}">${fav ? '★' : '☆'}</button></li>`;
+}
+
+function historyRows() {
+  return S.history.filter(h => S.historyMonth === 'all' || monthKey(h.ts) === S.historyMonth);
+}
+function monthlySeries() {
+  const pts = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(TODAY.getFullYear(), TODAY.getMonth() - i, 1);
+    const key = monthKey(d.getTime());
+    const rows = S.history.filter(h => monthKey(h.ts) === key);
+    pts.push({ label: MO[d.getMonth()], tip: `${monthLabel(key)} · ${rows.length} charges · ${kwhFmt(sum(rows, h => h.kwh))} kWh${i === 0 ? ' (so far)' : ''}`, v: sum(rows, h => h.cost), partial: i === 0, key });
+  }
+  return pts;
+}
+function viewHistory() {
+  const rows = historyRows();
+  const months = [...new Set(S.history.map(h => monthKey(h.ts)))];
+  const due = pending();
+  return `<div class="toolbar"><label class="check" for="hist-month" style="font-weight:600">Show</label>
+      <select class="input" id="hist-month" style="width:auto">${[['all', 'All charges'], ...months.map(k => [k, monthLabel(k)])].map(([v, l]) => `<option value="${v}"${S.historyMonth === v ? ' selected' : ''}>${l}</option>`).join('')}</select>
+      <button type="button" class="btn grow" data-act="export">Export CSV</button></div>
+    ${due.length ? `<section class="notice" aria-label="Payment due"><div><strong>${rwf(sum(due, h => h.cost))} RWF waiting for payment</strong><span class="muted">Unpaid charges are marked below.</span></div></section>` : ''}
+    <section class="card" aria-labelledby="spend-h"><div class="card-head"><div><h2 id="spend-h">What you spent each month</h2><p>RWF for finished charges, last six months. This month is still going.</p></div>
+      <button type="button" class="btn btn-sm" data-act="toggle-table" aria-pressed="${S.showTable}">${S.showTable ? 'Hide table' : 'Show as table'}</button></div>
+      <div class="chart" data-chart="spend" tabindex="0" aria-label="Monthly spending chart. Use the arrow keys to read each month."></div>
+      ${S.showTable ? `<div class="table-wrap" style="margin-top:12px"><table><thead><tr><th scope="col">Month</th><th scope="col" class="r">Spent (RWF)</th></tr></thead><tbody>${monthlySeries().map(p => `<tr><td>${esc(p.tip)}</td><td class="r">${rwf(p.v)}</td></tr>`).join('')}</tbody></table></div>` : ''}
+    </section>
+    <section class="card" aria-labelledby="hist-h"><div class="card-head"><div><h2 id="hist-h">Charges</h2><p>${rows.length} charge${rows.length === 1 ? '' : 's'}${S.historyMonth === 'all' ? ' since you joined' : ` in ${monthLabel(S.historyMonth)}`}</p></div></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th scope="col">When</th><th scope="col">Station</th><th scope="col">Slot</th><th scope="col" class="r">Time</th><th scope="col" class="r">kWh</th><th scope="col" class="r">Cost (RWF)</th><th scope="col">Payment</th><th scope="col"><span class="sr">Receipt</span></th></tr></thead>
+        <tbody>${rows.map(h => `<tr><td>${stamp(h.ts)}</td><td>${esc(station(h.stationId).name)}</td><td class="mono">${esc(h.charger)}</td><td class="r">${durMin(h.minutes)}</td><td class="r">${kwhFmt(h.kwh)}</td><td class="r">${rwf(h.cost)}</td>
+          <td>${h.payment === 'paid' ? '<span class="pill pill-green">Paid</span>' : `<button type="button" class="btn btn-sm btn-primary" data-act="pay" data-id="${h.id}">Pay now</button>`}</td>
+          <td><button type="button" class="btn btn-sm" data-act="receipt" data-id="${h.id}">Receipt</button></td></tr>`).join('') || '<tr><td colspan="8" class="muted">No charges in this month.</td></tr>'}</tbody>
+        ${rows.length ? `<tfoot><tr><td colspan="4">Total</td><td class="r">${kwhFmt(sum(rows, h => h.kwh))}</td><td class="r">${rwf(sum(rows, h => h.cost))}</td><td colspan="2"></td></tr></tfoot>` : ''}
+      </table></div></section>`;
+}
+
+function viewProfile() {
+  const a = S.account, e = S.profileErrors || {};
+  return `<div class="two-col">
+    <section class="card" aria-labelledby="me-h"><div class="card-head"><div><h2 id="me-h">Your details</h2><p>Changes apply to the app straight away.</p></div></div>
+      <form id="details-form" style="display:grid;gap:14px" novalidate>
+        <div class="field"><label for="pf-name">Full name</label><input class="input" id="pf-name" name="name" value="${esc(a.name)}" maxlength="60" autocomplete="name"${e.name ? ' aria-invalid="true" aria-describedby="pf-name-err"' : ''}>${e.name ? `<p class="err" id="pf-name-err">${e.name}</p>` : ''}</div>
+        <div class="field"><label for="pf-phone">Phone number</label>
+          <div class="row" style="flex-wrap:nowrap"><input class="input" id="pf-phone" value="${esc(a.phone)}" readonly aria-describedby="pf-phone-hint"><button type="button" class="btn" data-act="change-phone">Change</button></div>
+          <p class="hint" id="pf-phone-hint">You sign in with this number. Changing it needs a code we text to the new number.</p></div>
+        <div class="field"><label for="pf-email">Email for receipts (optional)</label><input class="input" id="pf-email" name="email" type="email" value="${esc(a.email)}" maxlength="80" autocomplete="email" placeholder="you@example.com"${e.email ? ' aria-invalid="true" aria-describedby="pf-email-err"' : ''}>${e.email ? `<p class="err" id="pf-email-err">${e.email}</p>` : ''}</div>
+        <div class="row"><button type="submit" class="btn btn-primary">Save details</button></div>
+      </form></section>
+    <div style="display:grid;gap:20px">
+      <section class="card" aria-labelledby="car-h"><div class="card-head"><div><h2 id="car-h">Your cars</h2><p>We use the battery size for time estimates and the connectors to show slots that fit.</p></div>
+        <button type="button" class="btn btn-sm" data-act="add-car">+ Add car</button></div>
+        <ul class="items">${a.vehicles.map(v => `<li class="item"><div class="item-main"><strong>${esc(v.name)}${v.isDefault ? '<span class="tag">Default</span>' : ''}</strong>
+          <span>${esc(v.plate)} · ${v.battery} kWh battery · ${v.connectors.map(c => CONNECTORS[c]).join(' + ')}</span></div>
+          <div class="row">${v.isDefault ? '' : `<button type="button" class="btn btn-sm" data-act="default-car" data-id="${v.id}">Make default</button>`}
+            <button type="button" class="btn btn-sm" data-act="edit-car" data-id="${v.id}">Edit</button>
+            <button type="button" class="btn btn-sm" data-act="remove-car" data-id="${v.id}"${a.vehicles.length === 1 ? ' disabled title="Keep at least one car"' : ''}>Remove</button></div></li>`).join('')}</ul></section>
+      <section class="card" aria-labelledby="pay-h"><div class="card-head"><div><h2 id="pay-h">Mobile Money</h2><p>You approve each payment on your phone.</p></div>
+        <button type="button" class="btn btn-sm" data-act="add-pay">+ Add number</button></div>
+        <ul class="items">${a.payments.map(p => `<li class="item"><div class="item-main"><strong>${PROVIDER[p.provider]}${p.isDefault ? '<span class="tag">Default</span>' : ''}</strong><span class="mono">${esc(p.phone)}</span></div>
+          <div class="row">${p.isDefault ? '' : `<button type="button" class="btn btn-sm" data-act="default-pay" data-id="${p.id}">Make default</button>`}
+            <button type="button" class="btn btn-sm" data-act="remove-pay" data-id="${p.id}"${a.payments.length === 1 ? ' disabled title="Keep at least one number"' : ''}>Remove</button></div></li>`).join('')}</ul></section>
+    </div></div>`;
+}
+
+const NOTIFS = [
+  ['fiveMin', '5 minutes left', 'Shortly before your car is full.'],
+  ['complete', 'Charging complete', 'When your car is fully charged, so you can move it.'],
+  ['idleFee', 'Idle fee warning', 'Five minutes before overstay fees start.'],
+  ['eighty', 'Battery at 80%', 'The best point to stop for battery health.'],
+  ['slotFree', 'Slot free at a station you’re waiting for', 'When you joined a waitlist from the app.'],
+  ['receipts', 'Email receipts', 'A receipt after every payment. Needs an email address in your profile.'],
+];
+function viewSettings() {
+  const a = S.account;
+  const sw = (key, on, label) => `<button type="button" class="switch" role="switch" aria-checked="${on}" aria-label="${esc(label)}" data-act="${key === 'showName' ? 'show-name' : 'notif'}" data-id="${key}"></button>`;
+  return `<div class="two-col">
+    <section class="card" aria-labelledby="nt-h"><div class="card-head"><div><h2 id="nt-h">Notifications</h2><p>What we tell you while you charge.</p></div></div>
+      ${NOTIFS.map(([k, t, d]) => `<div class="setting"><div class="setting-text"><strong>${t}</strong><span>${d}</span></div>${sw(k, a.notif[k], t)}</div>`).join('')}
+    </section>
+    <div style="display:grid;gap:20px">
+      <section class="card" aria-labelledby="ch-h"><div class="card-head"><div><h2 id="ch-h">How we reach you</h2><p>App alerts work best while you’re away from the car.</p></div></div>
+        <div class="radio-row" role="radiogroup" aria-labelledby="ch-h">${[['push', 'App notification'], ['whatsapp', 'WhatsApp'], ['sms', 'SMS']].map(([v, l]) => `<label class="radio-card"><input type="radio" name="channel" value="${v}"${a.channel === v ? ' checked' : ''}> ${l}</label>`).join('')}</div></section>
+      <section class="card" aria-labelledby="pr-h"><div class="card-head"><div><h2 id="pr-h">Privacy</h2><p>What station managers see when you charge.</p></div></div>
+        <div class="setting"><div class="setting-text"><strong>Show my name to station managers</strong><span>${a.showName ? `They see “${esc(a.name)}”.` : `They see only “•••• ${last4(a.phone)}”.`}</span></div>${sw('showName', a.showName, 'Show my name to station managers')}</div>
+        <div class="setting"><div class="setting-text"><strong>Download my data</strong><span>Every charge on your account as a CSV file.</span></div><button type="button" class="btn btn-sm" data-act="export-all">Download</button></div>
+      </section>
+    </div></div>`;
+}
+
+/* ================= modals ================= */
+function modalHtml() {
+  const m = S.modal;
+  if (!m) return '';
+  const wrap = inner => `<div class="scrim"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">${inner}</div></div>`;
+  const head = t => `<div class="modal-head"><h2 id="m-title">${t}</h2><button type="button" class="close-x" data-act="close-modal" aria-label="Close">✕</button></div>`;
+  if (m.kind === 'receipt') {
+    const h = S.history.find(x => x.id === m.id), st = station(h.stationId);
+    return wrap(`${head('Receipt')}
+      <div class="receipt"><div><span>Station</span><strong>${esc(st.name)}</strong></div><div><span>Address</span><span>${esc(st.address)}</span></div>
+        <div><span>Slot</span><span class="mono">${esc(h.charger)}</span></div><div><span>Started</span><span>${stamp(h.ts)}</span></div><div><span>Charging time</span><span>${durMin(h.minutes)}</span></div>
+        <div><span>Energy</span><span>${kwhFmt(h.kwh)} kWh × ${h.price} RWF</span></div><div><span>Energy cost</span><span>${rwf(h.kwh * h.price)} RWF</span></div>
+        ${h.idle ? `<div><span>Idle fee</span><span>${rwf(h.idle)} RWF</span></div>` : ''}
+        <div class="total"><span>Total</span><span>${rwf(h.cost)} RWF</span></div>
+        <div><span>Payment</span><span>${h.payment === 'paid' ? `Paid with ${esc(methodLabel(h.method))}` : 'Not paid yet'}</span></div>
+        ${h.ref ? `<div><span>Reference</span><span class="mono">${esc(h.ref)}</span></div>` : ''}</div>
+      <div class="modal-actions">${h.ref ? `<button type="button" class="btn" data-act="copy-ref" data-id="${esc(h.ref)}">Copy reference</button>` : `<button type="button" class="btn btn-primary" data-act="pay" data-id="${h.id}">Pay ${rwf(h.cost)} RWF</button>`}<button type="button" class="btn" data-act="close-modal">Close</button></div>`);
+  }
+  if (m.kind === 'pay') {
+    const h = S.history.find(x => x.id === m.id), st = station(h.stationId);
+    const methods = S.account.payments;
+    return wrap(`${head(`Pay ${rwf(h.cost)} RWF`)}<p class="muted">${esc(st.name)} · ${stamp(h.ts)} · ${kwhFmt(h.kwh)} kWh</p>
+      ${m.step === 'waiting' ? `<p class="receipt" style="text-align:center" role="status">Check your phone and approve the ${esc(methodLabel(m.method))} request…</p>`
+      : `<fieldset><legend style="font-weight:600;font-size:13px;margin-bottom:8px">Pay with</legend><div style="display:grid;gap:6px">${methods.map(p => `<label class="radio-card"><input type="radio" name="pay-method" value="${p.id}"${(m.method || methods.find(x => x.isDefault).id) === p.id ? ' checked' : ''}> ${PROVIDER[p.provider]} <span class="mono muted">${esc(p.phone)}</span></label>`).join('')}</div></fieldset>`}
+      <div class="modal-actions"><button type="button" class="btn btn-ghost" data-act="close-modal"${m.step === 'waiting' ? ' disabled' : ''}>Cancel</button><button type="button" class="btn btn-primary" data-act="pay-go" data-id="${h.id}"${m.step === 'waiting' ? ' disabled' : ''}>${m.step === 'waiting' ? 'Waiting for approval…' : `Send request`}</button></div>`);
+  }
+  if (m.kind === 'car') {
+    const v = m.data, e = m.errors || {};
+    const err = k => (e[k] ? `<p class="err" id="car-${k}-err">${e[k]}</p>` : '');
+    const inv = k => (e[k] ? ` aria-invalid="true" aria-describedby="car-${k}-err"` : '');
+    return wrap(`${head(m.id ? 'Edit car' : 'Add a car')}<form id="car-form" style="display:grid;gap:14px" novalidate>
+      <div class="field"><label for="car-name">Make and model</label><input class="input" id="car-name" name="name" value="${esc(v.name)}" maxlength="50" placeholder="e.g. BYD Atto 3"${inv('name')}>${err('name')}</div>
+      <div class="form-grid"><div class="field"><label for="car-plate">Number plate</label><input class="input mono" id="car-plate" name="plate" value="${esc(v.plate)}" maxlength="12" placeholder="RAF 452 J"${inv('plate')}>${err('plate')}</div>
+        <div class="field"><label for="car-battery">Battery size (kWh)</label><input class="input" id="car-battery" name="battery" inputmode="decimal" value="${esc(v.battery)}"${inv('battery')}>${err('battery')}</div></div>
+      <fieldset><legend style="font-weight:600;font-size:13px;margin-bottom:8px">Connectors your car takes</legend><div class="row">${Object.entries(CONNECTORS).map(([k, l]) => `<label class="check"><input type="checkbox" name="connectors" value="${k}"${v.connectors.includes(k) ? ' checked' : ''}> ${l}</label>`).join('')}</div>${err('connectors')}</fieldset>
+      <div class="modal-actions"><button type="button" class="btn btn-ghost" data-act="close-modal">Cancel</button><button type="submit" class="btn btn-primary">${m.id ? 'Save car' : 'Add car'}</button></div></form>`);
+  }
+  if (m.kind === 'add-pay') {
+    return wrap(`${head('Add a Mobile Money number')}<form id="pay-form" style="display:grid;gap:14px" novalidate>
+      <div class="field"><label for="pay-phone">Phone number</label><input class="input" id="pay-phone" name="phone" inputmode="tel" placeholder="078 123 4567"${m.error ? ' aria-invalid="true" aria-describedby="pay-err"' : ''}>
+        <p class="hint">MTN numbers start 078 or 079, Airtel numbers 072 or 073.</p>${m.error ? `<p class="err" id="pay-err">${m.error}</p>` : ''}</div>
+      <div class="modal-actions"><button type="button" class="btn btn-ghost" data-act="close-modal">Cancel</button><button type="submit" class="btn btn-primary">Add number</button></div></form>`);
+  }
+  if (m.kind === 'phone') {
+    return wrap(`${head('Change your phone number')}<form id="phone-form" style="display:grid;gap:14px" novalidate>
+      ${m.step === 'code' ? `<p class="muted">We sent a 6-digit code to ${esc(m.phone)}. In this demo the code is 123456.</p>
+        <div class="field"><label for="ph-code">Code</label><input class="input mono" id="ph-code" name="code" inputmode="numeric" maxlength="6" autocomplete="one-time-code"${m.error ? ' aria-invalid="true" aria-describedby="ph-err"' : ''}>${m.error ? `<p class="err" id="ph-err">${m.error}</p>` : ''}</div>`
+      : `<div class="field"><label for="ph-new">New phone number</label><input class="input" id="ph-new" name="phone" inputmode="tel" placeholder="078 123 4567"${m.error ? ' aria-invalid="true" aria-describedby="ph-err"' : ''}>${m.error ? `<p class="err" id="ph-err">${m.error}</p>` : ''}</div>`}
+      <div class="modal-actions"><button type="button" class="btn btn-ghost" data-act="close-modal">Cancel</button><button type="submit" class="btn btn-primary">${m.step === 'code' ? 'Confirm' : 'Send code'}</button></div></form>`);
+  }
+  if (m.kind === 'csv') {
+    return wrap(`${head('Copy your data')}<p class="muted">Saving files isn’t available in this view. Copy the CSV and paste it into a spreadsheet.</p>
+      <textarea class="input mono" id="csv-text" rows="9" readonly>${esc(m.csv)}</textarea>
+      <div class="modal-actions"><button type="button" class="btn btn-primary" data-act="copy-csv">Copy CSV</button></div>`);
+  }
+  return '';
+}
+
+/* ================= chart ================= */
+const barPath = (x, y, w, h, r) => { r = Math.min(r, w / 2, h); return `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z`; };
+function niceScale(vmax) {
+  if (!(vmax > 0)) return { top: 1000, step: 250 };
+  const raw = vmax / 4, p = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map(k => k * p).find(s => s >= raw);
+  return { top: Math.ceil(vmax / step) * step, step };
+}
+function paintChart(el, pts) {
+  const W = Math.max(260, Math.floor(el.clientWidth)), H = 220, M = { t: 22, r: 12, b: 26, l: 46 };
+  if (el._w === W && el._pts === pts) return;
+  el._w = W; el._pts = pts;
+  const pw = W - M.l - M.r, ph = H - M.t - M.b, n = pts.length, band = pw / n, bw = Math.min(24, band * 0.5);
+  const { top, step } = niceScale(Math.max(...pts.map(p => p.v)));
+  const y = v => M.t + ph - (v / top) * ph, x = i => M.l + band * (i + 0.5);
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Spending per month">`;
+  for (let v = 0; v <= top + 1e-9; v += step) s += `<line class="grid" x1="${M.l}" x2="${W - M.r}" y1="${y(v)}" y2="${y(v)}"/><text class="axis" x="${M.l - 8}" y="${y(v) + 4}" text-anchor="end">${compact(v)}</text>`;
+  pts.forEach((p, i) => {
+    s += `<text class="axis" x="${x(i)}" y="${H - 6}" text-anchor="middle">${p.label}</text>`;
+    const h = p.v > 0 ? Math.max(2, (p.v / top) * ph) : 0;
+    if (h) s += `<path class="bar" data-i="${i}" d="${barPath(x(i) - bw / 2, M.t + ph - h, bw, h, 4)}" fill="var(--chart-series)"${p.partial ? ' fill-opacity="0.55"' : ''}/>`;
+  });
+  const mx = pts.reduce((b, p, i) => (p.v > pts[b].v ? i : b), 0);
+  if (pts[mx].v > 0) s += `<text class="val" x="${x(mx)}" y="${y(pts[mx].v) - 7}" text-anchor="middle">${compact(pts[mx].v)}</text>`;
+  s += `<rect x="${M.l}" y="${M.t}" width="${pw}" height="${ph}" fill="transparent"/></svg><div class="tip" hidden></div>`;
+  el.innerHTML = s;
+  const svg = el.querySelector('svg'), tip = el.querySelector('.tip');
+  const hide = () => { tip.hidden = true; el.classList.remove('has-hover'); el.querySelectorAll('.bar').forEach(b => b.classList.remove('is-hover')); };
+  const show = i => {
+    el._i = i; tip.textContent = '';
+    const b = document.createElement('strong'); b.textContent = `${rwf(pts[i].v)} RWF`;
+    const t = document.createElement('span'); t.textContent = pts[i].tip;
+    tip.append(b, t); tip.hidden = false;
+    tip.style.left = `${clamp(x(i), 110, W - 110)}px`; tip.style.top = `${y(pts[i].v)}px`;
+    el.classList.add('has-hover'); el.querySelectorAll('.bar').forEach(bar => bar.classList.toggle('is-hover', Number(bar.dataset.i) === i));
+  };
+  svg.addEventListener('pointermove', ev => { const r = svg.getBoundingClientRect(); show(clamp(Math.floor((ev.clientX - r.left - M.l) / band), 0, n - 1)); });
+  svg.addEventListener('pointerleave', hide);
+  el.onblur = hide;
+  el.onkeydown = ev => {
+    if (ev.key !== 'ArrowLeft' && ev.key !== 'ArrowRight') { if (ev.key === 'Escape') hide(); return; }
+    ev.preventDefault(); show(clamp(el._i == null ? n - 1 : el._i + (ev.key === 'ArrowRight' ? 1 : -1), 0, n - 1));
+  };
+}
+const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(entries => entries.forEach(en => { if (en.target._pts) { en.target._w = 0; paintChart(en.target, en.target._pts); } })) : null;
+
+/* ================= render ================= */
+const TITLES = {
+  overview: ['Overview', () => `Welcome back, ${S.account.name.split(' ')[0]}`],
+  history: ['Charging history', () => 'Every charge, receipt and payment'],
+  profile: ['Profile & car', () => 'Edit your details, cars and Mobile Money numbers'],
+  settings: ['Settings', () => 'Notifications and privacy'],
+};
+const viewEl = document.getElementById('view');
+function render() {
+  pull();
+  const ae = document.activeElement;
+  const focusId = ae && ae.id && !document.getElementById('modal-root').contains(ae) ? ae.id : null;
+  document.querySelectorAll('[data-tab]').forEach(b => { if (b.dataset.tab === S.tab) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  const due = pending().length, badge = document.getElementById('badge-pending');
+  badge.hidden = !due; badge.textContent = due; badge.setAttribute('aria-label', `${due} to pay`);
+  document.getElementById('who-name').textContent = S.account.name;
+  document.getElementById('who-phone').textContent = S.account.phone;
+  document.getElementById('who-initial').textContent = (S.account.name.trim()[0] || 'J').toUpperCase();
+  document.getElementById('page-title').textContent = TITLES[S.tab][0];
+  document.getElementById('page-sub').textContent = TITLES[S.tab][1]();
+  document.getElementById('pv-live').checked = !!S.session;
+  if (ro) ro.disconnect();
+  viewEl.innerHTML = { overview: viewOverview, history: viewHistory, profile: viewProfile, settings: viewSettings }[S.tab]();
+  const chart = viewEl.querySelector('[data-chart="spend"]');
+  if (chart) { paintChart(chart, monthlySeries()); if (ro) ro.observe(chart); }
+  saveNet();
+  lastStatus = S.session ? S.session.status : null;
+  renderModal();
+  if (focusId && !S.modal) { const el = document.getElementById(focusId); if (el && !el.disabled) el.focus({ preventScroll: true }); }
+}
+function renderModal() {
+  const root = document.getElementById('modal-root'), wasOpen = root.childElementCount > 0;
+  root.innerHTML = modalHtml();
+  if (S.modal && !wasOpen) { const t = root.querySelector('.modal input:not([type="radio"]), .modal input[type="radio"]:checked, .modal button:not(.close-x)'); if (t) t.focus(); }
+}
+function openModal(m) { if (!S.modal) S.modalReturn = document.activeElement; S.modal = m; renderModal(); }
+function closeModal() { S.modal = null; renderModal(); if (S.modalReturn && document.contains(S.modalReturn)) S.modalReturn.focus(); }
+function toast(msg) {
+  const box = document.getElementById('toasts'), el = document.createElement('div');
+  el.className = 'toast'; el.textContent = msg; box.append(el);
+  while (box.childElementCount > 2) box.firstElementChild.remove();
+  setTimeout(() => el.remove(), 3200);
+}
+
+/* ================= live updates ================= */
+let lastStatus = null;
+setInterval(() => {
+  const s = S.session;
+  if (!s) return;
+  const was = lastStatus;
+  lastStatus = s.status;
+  if (S.tab !== 'overview') return;
+  if (was === 'charging' && s.status === 'full' && !S.modal) { render(); toast('Your car is fully charged. Please move it so the next driver can charge.'); return; }
+  const set = (k, v) => viewEl.querySelectorAll(`[data-tick="${k}"]`).forEach(el => { el.textContent = v; });
+  set('pct', `${Math.floor(s.pct)}%`);
+  set('kwh', `${kwhFmt(s.kwh)} kWh`);
+  set('cost', `${rwf(s.kwh * station(s.stationId).price)} RWF`);
+  set('elapsed', durMin(Math.floor((now() - s.start) / MIN)));
+  if (s.status === 'charging') set('left', `${s.pct < 80 ? minutesTo(80) : minutesTo(100)} min`);
+  const monthStart = new Date(TODAY.getFullYear(), TODAY.getMonth(), 1).getTime();
+  set('month-kwh', kwhFmt(sum(S.history.filter(h => h.ts >= monthStart), h => h.kwh) + s.kwh));
+  const ring = viewEl.querySelector('.ring');
+  if (ring) { ring.querySelector('svg').outerHTML = ringSvg(s.pct); ring.setAttribute('aria-valuenow', Math.floor(s.pct)); }
+}, 1000);
+
+/* ================= actions ================= */
+// Stopping frees the slot for everyone and records the charge, unpaid, where the manager and admin see it too
+function finishSession() {
+  const s = S.session;
+  const st = NET.stations.find(x => x.id === s.stationId), c = st.chargers.find(x => x.id === s.charger);
+  const kwh = Math.round(s.kwh * 10) / 10;
+  const row = { id: `n${s.start}-${c.id}`, stationId: st.id, ts: s.start, charger: c.id, driver: NET.driver.name, driverId: NET.driver.id,
+    minutes: Math.max(1, Math.round((now() - s.start) / MIN)), kwh, price: st.price, idle: 0, cost: Math.round(kwh * st.price), payment: 'pending', method: null, ref: null };
+  NET.sessions.push(row);
+  Object.assign(c, { status: 'available', since: now(), session: null });
+  st.updated = now();
+  S.stopConfirm = false;
+  return row;
+}
+// Prototype switch: plug Jean-Pierre's car in at SELAVOLT (DC-2, or DC-1 if DC-2 is taken)
+function plugIn() {
+  const st = NET.stations.find(x => x.id === 'selavolt');
+  const c = st.chargers.find(x => x.id === 'DC-2' && x.status === 'available') || st.chargers.find(x => x.status === 'available' && x.connector === 'CCS');
+  if (!c || st.status !== 'active' || !st.online) return false;
+  const t = now(), startPct = 38;
+  Object.assign(c, { status: 'busy', since: t, session: { driver: NET.driver.name, driverId: NET.driver.id, start: t, kwhAt: 0, at: t, kw: 40, startPct, maxKwh: Math.round(((100 - startPct) / 100) * battery() / 0.9 * 10) / 10 } });
+  st.updated = t;
+  return true;
+}
+function unplug() {
+  NET.stations.forEach(st => st.chargers.forEach(c => {
+    if (c.session && c.session.driverId === NET.driver.id) Object.assign(c, { status: 'available', since: now(), session: null });
+  }));
+}
+function csvFor(rows) {
+  const cell = v => (/[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v));
+  const lines = [['date', 'time', 'station', 'slot', 'minutes', 'kwh', 'price_rwf_per_kwh', 'idle_fee_rwf', 'total_rwf', 'payment', 'reference'].join(',')];
+  rows.slice().sort((a, b) => a.ts - b.ts).forEach(h => lines.push([isoDate(h.ts), hhmm(h.ts), station(h.stationId).name, h.charger, h.minutes, h.kwh.toFixed(1), h.price, h.idle, h.cost, h.payment, h.ref || ''].map(cell).join(',')));
+  return `${lines.join('\n')}\n`;
+}
+async function exportCsv(rows, filename) {
+  const csv = csvFor(rows);
+  if (window.claude && typeof window.claude.use === 'function') {
+    let dl = null;
+    try { dl = await window.claude.use('downloads'); } catch (e) { dl = null; }
+    if (dl) {
+      try { await dl.save({ filename, data: csv }); toast('CSV saved.'); }
+      catch (err) { if (err && err.code === 'declined') toast('Download cancelled.'); else openModal({ kind: 'csv', csv }); }
+      return;
+    }
+    openModal({ kind: 'csv', csv });
+    return;
+  }
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  const link = document.createElement('a'); link.href = url; link.download = filename;
+  document.body.append(link); link.click(); link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  toast('CSV downloaded.');
+}
+async function copyText(text, msg, el) {
+  try { await navigator.clipboard.writeText(text); toast(msg); }
+  catch (e) { if (el) { el.focus(); el.select(); } toast('Copying is blocked here. The text is selected, press Ctrl+C.'); }
+}
+
+document.addEventListener('click', ev => {
+  if (ev.target.classList && ev.target.classList.contains('scrim')) { if (!(S.modal && S.modal.step === 'waiting')) closeModal(); return; }
+  const tabBtn = ev.target.closest('[data-tab]');
+  if (tabBtn) {
+    S.tab = tabBtn.dataset.tab; S.stopConfirm = false; S.profileErrors = null;
+    try { localStorage.setItem('chargerw-customer-tab', S.tab); } catch (e) { /* storage unavailable */ }
+    render(); window.scrollTo(0, 0); document.getElementById('main').scrollTop = 0; return;
+  }
+  const el = ev.target.closest('[data-act]');
+  if (!el) return;
+  const act = el.dataset.act, id = el.dataset.id, a = S.account;
+  switch (act) {
+    case 'close-modal': closeModal(); break;
+    case 'reset-demo':
+      try { localStorage.removeItem(ACCOUNT_KEY); } catch (e) { /* storage unavailable */ }
+      Object.assign(S, { account: defaultAccount(), baseHistory: genHistory(), historyMonth: 'all', stopConfirm: false, modal: null, profileErrors: null });
+      resetNet(); render(); toast('Demo data reset in every open dashboard.'); break;
+    case 'stop': S.stopConfirm = true; render(); document.getElementById('stop-yes').focus(); break;
+    case 'stop-cancel': S.stopConfirm = false; render(); document.getElementById('stop-btn').focus(); break;
+    case 'stop-yes': {
+      el.disabled = true;
+      const h = finishSession();
+      render(); toast('Charging stopped. Unplug your car.');
+      openModal({ kind: 'pay', id: h.id, step: 'choose' });
+      break;
+    }
+    case 'pay': S.modal = null; openModal({ kind: 'pay', id, step: 'choose' }); break;
+    case 'pay-go': {
+      const chosen = document.querySelector('input[name="pay-method"]:checked');
+      S.modal.method = chosen ? chosen.value : a.payments.find(p => p.isDefault).id;
+      S.modal.step = 'waiting'; renderModal();
+      const payId = id, method = S.modal.method;
+      setTimeout(() => {
+        const h = S.history.find(x => x.id === payId);
+        markPaid(payId, method, `MP${isoDate(now()).slice(2).replace(/-/g, '')}.${hhmm(now()).replace(':', '')}.${String(10000 + Math.floor(Math.random() * 89999))}`);
+        S.modal = null; render(); toast(`Paid ${rwf(h.cost)} RWF. Receipt saved.`);
+      }, 2500);
+      break;
+    }
+    case 'receipt': openModal({ kind: 'receipt', id }); break;
+    case 'copy-ref': copyText(id, 'Reference copied.'); break;
+    case 'fav':
+      a.favorites = a.favorites.includes(id) ? a.favorites.filter(x => x !== id) : [...a.favorites, id];
+      saveAccount(); render(); break;
+    case 'toggle-table': S.showTable = !S.showTable; render(); break;
+    case 'export': exportCsv(historyRows(), `chargerw-charges-${S.historyMonth}.csv`); break;
+    case 'export-all': exportCsv(S.history, 'chargerw-my-data.csv'); break;
+    case 'copy-csv': copyText(S.modal.csv, 'CSV copied.', document.getElementById('csv-text')); break;
+    case 'change-phone': openModal({ kind: 'phone', step: 'phone' }); break;
+    case 'add-car': openModal({ kind: 'car', id: null, data: { name: '', plate: '', battery: '', connectors: ['CCS', 'Type2'] } }); break;
+    case 'edit-car': { const v = a.vehicles.find(x => x.id === id); openModal({ kind: 'car', id, data: { ...v, battery: String(v.battery), connectors: [...v.connectors] } }); break; }
+    case 'remove-car': {
+      const v = a.vehicles.find(x => x.id === id);
+      a.vehicles = a.vehicles.filter(x => x.id !== id);
+      if (v.isDefault) a.vehicles[0].isDefault = true;
+      saveAccount(); render(); toast(`${v.name} removed.`); break;
+    }
+    case 'default-car': a.vehicles.forEach(v => { v.isDefault = v.id === id; }); saveAccount(); render(); toast('Default car changed.'); break;
+    case 'add-pay': openModal({ kind: 'add-pay' }); break;
+    case 'remove-pay': {
+      const p = a.payments.find(x => x.id === id);
+      a.payments = a.payments.filter(x => x.id !== id);
+      if (p.isDefault) a.payments[0].isDefault = true;
+      saveAccount(); render(); toast('Number removed.'); break;
+    }
+    case 'default-pay': a.payments.forEach(p => { p.isDefault = p.id === id; }); saveAccount(); render(); toast('Default number changed.'); break;
+    case 'notif':
+      if (id === 'receipts' && !a.notif.receipts && !a.email) { toast('Add an email address in your profile first.'); break; }
+      a.notif[id] = !a.notif[id]; el.setAttribute('aria-checked', String(a.notif[id])); saveAccount(); toast('Saved.'); break;
+    case 'show-name': a.showName = !a.showName; saveAccount(); render(); toast(a.showName ? 'Station managers see your name.' : 'Station managers see only the last 4 digits of your number.'); break;
+    default: break;
+  }
+});
+
+document.addEventListener('change', ev => {
+  const t = ev.target;
+  if (t.id === 'pv-live') {
+    if (t.checked && !S.session && !plugIn()) toast('No free SELAVOLT slot for your car right now.');
+    if (!t.checked && S.session) { unplug(); S.stopConfirm = false; }
+    render(); return;
+  }
+  if (t.id === 'hist-month') { S.historyMonth = t.value; render(); return; }
+  if (t.name === 'channel') { S.account.channel = t.value; saveAccount(); toast(`Alerts will come by ${{ push: 'app notification', whatsapp: 'WhatsApp', sms: 'SMS' }[t.value]}.`); }
+});
+
+document.addEventListener('submit', ev => {
+  ev.preventDefault();
+  const f = ev.target, a = S.account;
+  if (f.id === 'details-form') {
+    const name = f.elements.name.value.trim().replace(/\s+/g, ' '), email = f.elements.email.value.trim();
+    const e = {};
+    if (name.length < 2) e.name = 'Enter your full name.';
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) e.email = 'Enter an email like name@example.com, or leave it empty.';
+    S.profileErrors = Object.keys(e).length ? e : null;
+    if (S.profileErrors) { render(); document.querySelector('#details-form [aria-invalid="true"]').focus(); return; }
+    a.name = name; a.email = email;
+    if (!email) a.notif.receipts = false;
+    saveAccount(); render(); toast('Details saved.');
+  } else if (f.id === 'car-form') {
+    const m = S.modal;
+    const data = { name: f.elements.name.value.trim(), plate: f.elements.plate.value.trim().toUpperCase().replace(/\s+/g, ' '), battery: f.elements.battery.value.trim(), connectors: [...f.querySelectorAll('input[name="connectors"]:checked')].map(i => i.value) };
+    const e = {};
+    if (!data.name) e.name = 'Enter the make and model.';
+    if (!/^R[A-Z]{2} ?\d{3} ?[A-Z]$/.test(data.plate)) e.plate = 'Use a Rwandan plate like RAF 452 J.';
+    const kwh = Number(data.battery.replace(',', '.'));
+    if (!(kwh >= 10 && kwh <= 200)) e.battery = 'Enter a battery size between 10 and 200 kWh.';
+    if (!data.connectors.length) e.connectors = 'Tick at least one connector.';
+    m.data = data; m.errors = Object.keys(e).length ? e : null;
+    if (m.errors) { renderModal(); const first = document.querySelector('#car-form [aria-invalid="true"]'); if (first) first.focus(); return; }
+    const plate = data.plate.replace(/^(R[A-Z]{2}) ?(\d{3}) ?([A-Z])$/, '$1 $2 $3');
+    if (m.id) Object.assign(a.vehicles.find(v => v.id === m.id), { name: data.name, plate, battery: kwh, connectors: data.connectors });
+    else a.vehicles.push({ id: `v${Date.now()}`, name: data.name, plate, battery: kwh, connectors: data.connectors, isDefault: false });
+    saveAccount(); S.modal = null; render(); toast(m.id ? 'Car saved.' : `${data.name} added.`);
+  } else if (f.id === 'pay-form') {
+    const phone = normalizePhone(f.elements.phone.value);
+    let error = null;
+    if (!phone) error = 'Enter a Rwandan mobile number, e.g. 078 123 4567.';
+    else if (a.payments.some(p => p.phone === phone)) error = 'This number is already on your account.';
+    if (error) { S.modal.error = error; renderModal(); document.getElementById('pay-phone').focus(); return; }
+    a.payments.push({ id: `p${Date.now()}`, provider: providerOf(phone), phone, isDefault: false });
+    saveAccount(); S.modal = null; render(); toast(`${PROVIDER[providerOf(phone)]} number added.`);
+  } else if (f.id === 'phone-form') {
+    const m = S.modal;
+    if (m.step === 'phone') {
+      const phone = normalizePhone(f.elements.phone.value);
+      if (!phone) { m.error = 'Enter a Rwandan mobile number, e.g. 078 123 4567.'; renderModal(); document.getElementById('ph-new').focus(); return; }
+      if (phone === a.phone) { m.error = 'That is already your number.'; renderModal(); document.getElementById('ph-new').focus(); return; }
+      Object.assign(m, { step: 'code', phone, error: null }); renderModal(); document.getElementById('ph-code').focus();
+    } else {
+      if (f.elements.code.value.trim() !== '123456') { m.error = 'That code is not right. In this demo it is 123456.'; renderModal(); document.getElementById('ph-code').focus(); return; }
+      a.phone = m.phone; saveAccount(); S.modal = null; render(); toast('Phone number changed. Sign in with the new number from now on.');
+    }
+  }
+});
+
+document.addEventListener('keydown', ev => {
+  if (ev.key !== 'Escape') return;
+  if (S.modal && S.modal.step !== 'waiting') closeModal();
+  else if (S.stopConfirm) { S.stopConfirm = false; render(); }
+});
+
+/* ================= theme ================= */
+const themeBtn = document.getElementById('theme-btn');
+const isDark = () => { const t = document.documentElement.getAttribute('data-theme'); return t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches; };
+const syncTheme = () => { document.getElementById('theme-label').textContent = isDark() ? 'Light mode' : 'Dark mode'; themeBtn.setAttribute('aria-label', isDark() ? 'Switch to light mode' : 'Switch to dark mode'); };
+themeBtn.addEventListener('click', () => {
+  const next = isDark() ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('chargerw-theme', next); } catch (e) { /* storage unavailable */ }
+  syncTheme();
+});
+try { const t = localStorage.getItem('chargerw-theme'); if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); } catch (e) { /* storage unavailable */ }
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncTheme);
+syncTheme();
+
+/* ================= start ================= */
+try { const t = localStorage.getItem('chargerw-customer-tab'); if (TITLES[t]) S.tab = t; } catch (e) { /* storage unavailable */ }
+const hashTab = location.hash.replace('#', '');
+if (TITLES[hashTab]) S.tab = hashTab;
+onNetChange(() => { if (!S.modal) render(); });
+render();
+})();
+</script>
+</body></html>
